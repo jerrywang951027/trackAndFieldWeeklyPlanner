@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Clone &amp; Re-publish: A beginner's guide</title>
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --panel: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #5a5a5a;
+    --line: #e6e6e1;
+    --accent: #2563eb;
+    --accent-soft: #dbeafe;
+    --code-bg: #0f1115;
+    --code-ink: #e6e6e6;
+    --code-key: #f59e0b;
+    --code-str: #86efac;
+    --code-com: #6b7280;
+    --warn-bg: #fff7ed;
+    --warn-line: #fdba74;
+    --tip-bg: #ecfeff;
+    --tip-line: #67e8f9;
+    --ok: #16a34a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+  header.hero {
+    background: linear-gradient(180deg, #ffffff 0%, #f7f7f5 100%);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 32px 32px 28px;
+    margin-bottom: 32px;
+  }
+  header.hero h1 {
+    margin: 0 0 8px;
+    font-size: 30px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  header.hero p { margin: 0; color: var(--muted); font-size: 16px; }
+  header.hero .pill {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  nav.toc {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+  }
+  nav.toc strong { display: block; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 8px; }
+  nav.toc ol { margin: 0; padding-left: 20px; }
+  nav.toc a { color: var(--ink); text-decoration: none; }
+  nav.toc a:hover { color: var(--accent); text-decoration: underline; }
+
+  section.step {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px 32px 24px;
+    margin-bottom: 22px;
+    position: relative;
+  }
+  section.step h2 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  section.step h2 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  section.step .lead {
+    color: var(--muted);
+    margin: 0 0 18px 44px;
+    font-size: 15px;
+  }
+  section.step h3 {
+    margin: 22px 0 8px;
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  section.step p { margin: 0 0 12px; }
+  section.step ul, section.step ol { margin: 0 0 12px; padding-left: 22px; }
+  section.step li { margin-bottom: 6px; }
+  code, kbd { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em; }
+  p code, li code {
+    background: #f0efea;
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: #b45309;
+  }
+
+  .cmd {
+    position: relative;
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 10px;
+    padding: 14px 56px 14px 18px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 14px;
+    line-height: 1.55;
+    overflow-x: auto;
+    margin: 8px 0 14px;
+    white-space: pre;
+  }
+  .cmd .com { color: var(--code-com); }
+  .cmd .key { color: var(--code-key); }
+  .cmd .str { color: var(--code-str); }
+  .cmd .copy {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #1f2937;
+    color: #d1d5db;
+    border: 1px solid #374151;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .cmd .copy:hover { background: #374151; color: #fff; }
+  .cmd .copy.ok { background: #14532d; color: #bbf7d0; border-color: #166534; }
+
+  .out {
+    background: #fafaf7;
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    color: #444;
+    white-space: pre-wrap;
+    margin: 4px 0 14px;
+  }
+
+  .callout {
+    border-left: 4px solid var(--warn-line);
+    background: var(--warn-bg);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  .callout.tip { border-color: var(--tip-line); background: var(--tip-bg); }
+  .callout strong { display: block; margin-bottom: 4px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .callout.tip strong { color: #0e7490; }
+  .callout.warn strong { color: #c2410c; }
+
+  .placeholder {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 0 4px;
+    border-radius: 3px;
+    font-style: italic;
+  }
+
+  hr.soft { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 40px;
+  }
+
+  @media (max-width: 640px) {
+    .wrap { padding: 32px 16px 56px; }
+    header.hero, section.step { padding: 22px 20px; border-radius: 10px; }
+    header.hero h1 { font-size: 24px; }
+    section.step h2 { font-size: 19px; }
+    section.step .lead { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="pill">Beginner Guide</span>
+    <h1>Clone this project &amp; re-publish it under your own GitHub account</h1>
+    <p>By the end of this guide your Mac will have a working copy of <code>trackAndFieldWeeklyPlanner</code>, every link to the original repo will be wiped, and a brand-new repo under your own GitHub account will hold an exact copy of the code.</p>
+  </header>
+
+  <nav class="toc">
+    <strong>What you'll do</strong>
+    <ol>
+      <li><a href="#prereq">Make sure your Mac has the tools</a></li>
+      <li><a href="#step1">Step 1 — Clone the repo</a></li>
+      <li><a href="#step2">Step 2 — Wipe the link to the original repo</a></li>
+      <li><a href="#step3">Step 3 — Create a new repo under your GitHub account</a></li>
+      <li><a href="#step4">Step 4 — Push the project to your new repo</a></li>
+      <li><a href="#step5">Step 5 — Install Node.js and run the app on your Mac</a></li>
+      <li><a href="#codex">Doing all of this from inside Codex / Cursor</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+    </ol>
+  </nav>
+
+  <!-- ─────────────────────────── PREREQUISITES ─────────────────────────── -->
+  <section class="step" id="prereq">
+    <h2><span class="num">0</span> Make sure your Mac has the tools</h2>
+    <p class="lead">You need three things: the Terminal app, <code>git</code>, and (recommended) the GitHub CLI <code>gh</code>. Check what's already installed before installing anything.</p>
+
+    <h3>Open the Terminal</h3>
+    <p>Press <kbd>⌘</kbd>+<kbd>Space</kbd>, type <code>Terminal</code>, hit Return. Everything below is typed into that window.</p>
+
+    <h3>Check git</h3>
+<div class="cmd"><button class="copy">Copy</button>git --version</div>
+    <p>If you see something like <code>git version 2.39.x</code>, you're good. If macOS prompts you to install the Xcode Command Line Tools, click <strong>Install</strong> and wait a few minutes.</p>
+
+    <h3>Check the GitHub CLI (optional but easiest)</h3>
+<div class="cmd"><button class="copy">Copy</button>gh --version</div>
+    <p>If <code>gh</code> is missing, install it with Homebrew:</p>
+<div class="cmd"><button class="copy">Copy</button><span class="com"># If you don't have Homebrew yet, install it first from https://brew.sh</span>
+brew install gh</div>
+
+    <h3>Sign in to GitHub from the CLI</h3>
+<div class="cmd"><button class="copy">Copy</button>gh auth login</div>
+    <p>Follow the prompts: choose <strong>GitHub.com</strong> → <strong>HTTPS</strong> → <strong>Yes, authenticate Git with my GitHub credentials</strong> → <strong>Login with a web browser</strong>. A one-time code will appear; paste it into the page that opens. When it finishes, run:</p>
+<div class="cmd"><button class="copy">Copy</button>gh auth status</div>
+    <p>You should see <code>✓ Logged in to github.com account &lt;your-username&gt;</code>.</p>
+
+    <div class="callout tip">
+      <strong>Tip</strong>
+      You can do everything in this guide without <code>gh</code> by creating the new repo on github.com in your browser. The <code>gh</code> CLI just makes it faster.
+    </div>
+  </section>
+
+  <!-- ─────────────────────────── STEP 1 ─────────────────────────── -->
+  <section class="step" id="step1">
+    <h2><span class="num">1</span> Clone the repo to your Mac</h2>
+    <p class="lead">"Cloning" downloads a copy of the project into a new folder on your Mac.</p>
+
+    <h3>Pick where to put it</h3>
+    <p>Most people use a folder like <code>~/workspace</code> or <code>~/Projects</code>. Move there first:</p>
+<div class="cmd"><button class="copy">Copy</button><span class="com"># Create the folder if it doesn't exist, then go into it</span>
+mkdir -p ~/workspace
+cd ~/workspace</div>
+
+    <h3>Clone</h3>
+<div class="cmd"><button class="copy">Copy</button>git clone https://github.com/jerrywang951027/trackAndFieldWeeklyPlanner.git</div>
+    <p>You'll see something like:</p>
+<div class="out">Cloning into 'trackAndFieldWeeklyPlanner'...
+remote: Enumerating objects: 62, done.
+Receiving objects: 100% (62/62), done.</div>
+
+    <h3>Move into the project folder</h3>
+<div class="cmd"><button class="copy">Copy</button>cd trackAndFieldWeeklyPlanner</div>
+
+    <h3>Verify</h3>
+<div class="cmd"><button class="copy">Copy</button>ls
+git remote -v</div>
+    <p>You should see all the project files, and <code>git remote -v</code> should show <code>origin</code> pointing at the original repo URL. That's exactly what we'll erase next.</p>
+  </section>
+
+  <!-- ─────────────────────────── STEP 2 ─────────────────────────── -->
+  <section class="step" id="step2">
+    <h2><span class="num">2</span> Wipe every trace of the original git repo</h2>
+    <p class="lead">The folder you just cloned has a hidden <code>.git</code> directory inside it that holds every commit, every branch, and the link back to the original GitHub repo. Deleting it gives you a clean slate.</p>
+
+    <div class="callout warn">
+      <strong>Make sure you are in the project folder</strong>
+      Before running the next command, double-check that you are inside <code>trackAndFieldWeeklyPlanner</code>, not somewhere else. Run <code>pwd</code> first.
+    </div>
+
+<div class="cmd"><button class="copy">Copy</button>pwd</div>
+    <p>The output should end with <code>/trackAndFieldWeeklyPlanner</code>. Now wipe the git data:</p>
+
+<div class="cmd"><button class="copy">Copy</button>rm -rf .git</div>
+
+    <h3>Verify</h3>
+<div class="cmd"><button class="copy">Copy</button>git status</div>
+    <p>You should now see:</p>
+<div class="out">fatal: not a git repository (or any of the parent directories): .git</div>
+    <p>That error is the goal — it means this is just a folder of files now, with no connection to the original repo, no commit history, no remotes. Perfect.</p>
+
+    <div class="callout tip">
+      <strong>What this actually removed</strong>
+      Every commit message, the entire history, the branches, the tags, and the <code>origin</code> URL pointing at the original repo. The source code itself is untouched.
+    </div>
+  </section>
+
+  <!-- ─────────────────────────── STEP 3 ─────────────────────────── -->
+  <section class="step" id="step3">
+    <h2><span class="num">3</span> Create a new repo under your own GitHub account</h2>
+    <p class="lead">Pick one of the two options below. Option A (CLI) is faster; Option B (browser) is more visual.</p>
+
+    <h3>Option A — Use <code>gh</code> in the Terminal (recommended)</h3>
+    <p>Stay inside the project folder, then run (replace <span class="placeholder">my-cool-repo</span> with whatever name you want):</p>
+<div class="cmd"><button class="copy">Copy</button>gh repo create my-cool-repo --public --description "My copy of the sprint training planner"</div>
+    <p>For a private repo, swap <code>--public</code> for <code>--private</code>. You'll see something like:</p>
+<div class="out">✓ Created repository &lt;your-username&gt;/my-cool-repo on GitHub
+  https://github.com/&lt;your-username&gt;/my-cool-repo</div>
+    <p><strong>Copy that URL — you'll need it in step 4.</strong></p>
+
+    <h3>Option B — Use the GitHub website</h3>
+    <ol>
+      <li>Open <a href="https://github.com/new" target="_blank" rel="noopener">https://github.com/new</a> in your browser.</li>
+      <li>Fill in the <strong>Repository name</strong> (e.g., <code>my-cool-repo</code>).</li>
+      <li>Choose <strong>Public</strong> or <strong>Private</strong>.</li>
+      <li><strong>Important:</strong> leave every checkbox <em>off</em> — do <strong>not</strong> add a README, <code>.gitignore</code>, or license. The new repo must start completely empty.</li>
+      <li>Click <strong>Create repository</strong>.</li>
+      <li>On the next page, copy the HTTPS URL (it looks like <code>https://github.com/&lt;your-username&gt;/my-cool-repo.git</code>).</li>
+    </ol>
+
+    <div class="callout warn">
+      <strong>Why "completely empty"</strong>
+      If GitHub auto-creates a README in the new repo, your first push will be rejected because the local history doesn't match. Empty = easy.
+    </div>
+  </section>
+
+  <!-- ─────────────────────────── STEP 4 ─────────────────────────── -->
+  <section class="step" id="step4">
+    <h2><span class="num">4</span> Push the project to your new repo</h2>
+    <p class="lead">Five commands and you're done. Make sure you're still inside the <code>trackAndFieldWeeklyPlanner</code> folder.</p>
+
+    <h3>1) Start a fresh git repo</h3>
+<div class="cmd"><button class="copy">Copy</button>git init -b main</div>
+    <p>This creates a new <code>.git</code> directory with <code>main</code> as the default branch.</p>
+
+    <h3>2) Stage every file</h3>
+<div class="cmd"><button class="copy">Copy</button>git add .</div>
+    <p>Don't worry — secrets and build artifacts are already excluded by the project's <code>.gitignore</code>. You can confirm with <code>git status</code> and look for any file ending in <code>.env</code> (there shouldn't be any).</p>
+
+    <h3>3) Make the first commit</h3>
+<div class="cmd"><button class="copy">Copy</button>git commit -m "Initial commit"</div>
+
+    <h3>4) Connect the local repo to your new GitHub repo</h3>
+    <p>Replace <span class="placeholder">YOUR-USERNAME</span> and <span class="placeholder">my-cool-repo</span> with your actual values:</p>
+<div class="cmd"><button class="copy">Copy</button>git remote add origin https://github.com/YOUR-USERNAME/my-cool-repo.git</div>
+
+    <h3>5) Push</h3>
+<div class="cmd"><button class="copy">Copy</button>git push -u origin main</div>
+    <p>You should see:</p>
+<div class="out">To https://github.com/YOUR-USERNAME/my-cool-repo.git
+ * [new branch]      main -&gt; main
+branch 'main' set up to track 'origin/main'.</div>
+
+    <h3>Verify it landed</h3>
+    <p>Open your new repo's URL in a browser. You should see the project files. If you ever want to confirm from the Terminal:</p>
+<div class="cmd"><button class="copy">Copy</button>git remote -v
+git log --oneline</div>
+
+    <div class="callout tip">
+      <strong>From now on, the normal git workflow applies</strong>
+      Edit files → <code>git add &lt;files&gt;</code> → <code>git commit -m "what I changed"</code> → <code>git push</code>. No more <code>-u origin main</code> needed; the upstream is already set.
+    </div>
+  </section>
+
+  <!-- ─────────────────────────── STEP 5: RUN THE APP ─────────────────────────── -->
+  <section class="step" id="step5">
+    <h2><span class="num">5</span> Install Node.js and run the app on your Mac</h2>
+    <p class="lead">The project is a Next.js web app. To run it on your Mac you need Node.js (which comes bundled with <code>npm</code>, the package installer). After that it's three commands: install dependencies, add an API key, start the dev server.</p>
+
+    <h3>5.1 — Install Node.js</h3>
+    <p>You have two ways to install Node. Option A (<code>nvm</code>) is what most developers use because it lets you switch Node versions per project. Option B is a one-click installer if you'd rather not deal with the Terminal.</p>
+
+    <h4 style="margin:14px 0 6px; font-size:14px; font-weight:600;">Option A — Install via <code>nvm</code> (recommended)</h4>
+    <p>Run this in the Terminal to download and install <code>nvm</code> (Node Version Manager):</p>
+<div class="cmd"><button class="copy">Copy</button>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash</div>
+    <p>Then close and reopen the Terminal window (so it picks up the new <code>nvm</code> command). Verify it's there:</p>
+<div class="cmd"><button class="copy">Copy</button>command -v nvm</div>
+    <p>You should see <code>nvm</code> printed. Now install the latest LTS (long-term support) Node and tell your shell to use it:</p>
+<div class="cmd"><button class="copy">Copy</button>nvm install --lts
+nvm use --lts
+nvm alias default lts/*</div>
+    <p>The last line makes that LTS version the default in every new Terminal window.</p>
+
+    <h4 style="margin:18px 0 6px; font-size:14px; font-weight:600;">Option B — Use the official installer</h4>
+    <ol>
+      <li>Open <a href="https://nodejs.org/en/download" target="_blank" rel="noopener">https://nodejs.org/en/download</a>.</li>
+      <li>Click the macOS <strong>LTS</strong> installer (<code>.pkg</code> file).</li>
+      <li>Open the downloaded file, click through the wizard, finish.</li>
+    </ol>
+
+    <h3>5.2 — Verify Node and npm</h3>
+<div class="cmd"><button class="copy">Copy</button>node --version
+npm --version</div>
+    <p>You should see something like:</p>
+<div class="out">v22.11.0
+10.9.0</div>
+    <p>This project requires Node 20 or newer. Anything <code>v20.x</code> or higher (including <code>v22.x</code>) is fine.</p>
+
+    <h3>5.3 — Move into the project folder</h3>
+    <p>If you're not already in it (you might have closed Terminal since the earlier steps):</p>
+<div class="cmd"><button class="copy">Copy</button>cd ~/workspace/trackAndFieldWeeklyPlanner</div>
+
+    <h3>5.4 — Install the project's dependencies</h3>
+<div class="cmd"><button class="copy">Copy</button>npm install</div>
+    <p>This reads <code>package.json</code>, downloads every library the app uses (React, Next.js, Tailwind, the Anthropic SDK, etc.) into a folder called <code>node_modules/</code>, and writes a lock file. <strong>Be patient — first time can take 1–3 minutes.</strong> Output looks like:</p>
+<div class="out">added 421 packages in 47s
+
+129 packages are looking for funding</div>
+    <p>The "funding" line is informational — ignore it. As long as you see <code>added &lt;number&gt; packages</code> and no red error text, you're good.</p>
+
+    <div class="callout tip">
+      <strong>What is <code>node_modules</code>?</strong>
+      The folder of downloaded libraries. It's huge (hundreds of megabytes), which is why the project's <code>.gitignore</code> excludes it. You never check it in — anyone who clones the repo just runs <code>npm install</code> to recreate it.
+    </div>
+
+    <h3>5.5 — Set up your environment file</h3>
+    <p>The app talks to Anthropic's Claude model and needs an API key. Copy the example file and edit it:</p>
+<div class="cmd"><button class="copy">Copy</button>cp .env.example .env.local</div>
+    <p>Open <code>.env.local</code> in any editor. From the Terminal you can use TextEdit:</p>
+<div class="cmd"><button class="copy">Copy</button>open -e .env.local</div>
+    <p>You'll see three lines. Replace the placeholder value with your real Anthropic API key:</p>
+<div class="cmd"><button class="copy">Copy</button>ANTHROPIC_API_KEY=<span class="str">sk-ant-...your-key-here...</span>
+ANTHROPIC_BASE_URL=https://eng-ai-model-gateway.sfproxy.devx-preprod.aws-esvc1-useast2.aws.sfdc.cl
+ANTHROPIC_MODEL=claude-opus-4-7</div>
+
+    <p><strong>Where do I get an API key?</strong></p>
+    <ul>
+      <li>If you work at Salesforce and use the internal model gateway, your team's preprod gateway already accepts your existing key — leave <code>ANTHROPIC_BASE_URL</code> as-is.</li>
+      <li>If you want to use Anthropic's public API, sign up at <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>, create a key, and <strong>delete the <code>ANTHROPIC_BASE_URL</code> line</strong> entirely (or set it to <code>https://api.anthropic.com</code>).</li>
+    </ul>
+    <p>Save the file (<kbd>⌘</kbd>+<kbd>S</kbd>) and close the editor.</p>
+
+    <div class="callout warn">
+      <strong>Never commit <code>.env.local</code></strong>
+      The project's <code>.gitignore</code> already excludes it, so <code>git add .</code> won't pick it up. But if you ever paste an API key into a different file by accident and push it, rotate the key immediately.
+    </div>
+
+    <h3>5.6 — Start the development server</h3>
+<div class="cmd"><button class="copy">Copy</button>npm run dev</div>
+    <p>Output looks like:</p>
+<div class="out">▲ Next.js 16.x
+- Local:        http://localhost:32026
+
+✓ Ready in 2.3s</div>
+
+    <h3>5.7 — Open the app in your browser</h3>
+    <p>Open <a href="http://localhost:32026" target="_blank" rel="noopener">http://localhost:32026</a>. On the very first visit you'll be redirected to <code>/onboarding</code> — fill in the 6-step wizard with your athlete profile, click finish, and you'll land on the dashboard. From there click <strong>Generate this week's plan</strong> on the home page.</p>
+
+    <div class="callout tip">
+      <strong>The first plan generation is slow on purpose</strong>
+      The default model is <code>claude-opus-4-7</code>, which can take 30–120 seconds to produce a structured 7-day plan. The button shows a live elapsed timer so you know it's still working. To make it faster, edit <code>.env.local</code> and switch <code>ANTHROPIC_MODEL=claude-sonnet-4-5</code>, then restart with <code>npm run dev</code>.
+    </div>
+
+    <h3>5.8 — Stop the dev server</h3>
+    <p>In the Terminal window where it's running, press <kbd>Ctrl</kbd>+<kbd>C</kbd>. The server stops; you can close the window.</p>
+
+    <h3>5.9 — Reset the local data (optional)</h3>
+    <p>The app stores everything (your profile, plans, logs, readiness check-ins) in a single JSON file at <code>.data/store.json</code>. To wipe it and start fresh:</p>
+<div class="cmd"><button class="copy">Copy</button>npm run db:reset</div>
+    <p>Next time you start the app, you'll be sent back to onboarding.</p>
+
+    <h3>Daily routine after the first run</h3>
+    <p>Once the app is set up, working on it is just two commands:</p>
+<div class="cmd"><button class="copy">Copy</button>cd ~/workspace/trackAndFieldWeeklyPlanner
+npm run dev</div>
+    <p>Open <a href="http://localhost:32026" target="_blank" rel="noopener">http://localhost:32026</a>, do your thing, <kbd>Ctrl</kbd>+<kbd>C</kbd> when done.</p>
+  </section>
+
+  <!-- ─────────────────────────── CODEX SECTION ─────────────────────────── -->
+  <section class="step" id="codex">
+    <h2><span class="num">★</span> Doing all of this from inside Codex / Cursor</h2>
+    <p class="lead">If you're using an AI coding agent (Cursor, Codex CLI, etc.) you don't have to type the commands yourself — describe the goal and let the agent run them. Here's a prompt that works.</p>
+
+    <h3>Prerequisite</h3>
+    <p>Open the agent's terminal once and run <code>gh auth login</code> so it can push on your behalf without asking for a password every time. After that, a single instruction is enough.</p>
+
+    <h3>Copy-paste this prompt into Codex / Cursor</h3>
+<div class="cmd"><button class="copy">Copy</button><span class="com"># Replace the placeholders before sending</span>
+
+I have an existing folder with a project I cloned from someone else's GitHub repo.
+Please do the following inside that folder:
+
+1. Verify I am inside the right folder by running `pwd` and showing me the result.
+2. Delete the existing `.git` directory so the project is no longer tied to the original repo.
+3. Create a new GitHub repo under my account named <span class="placeholder">my-cool-repo</span>
+   using the `gh` CLI. Make it <span class="placeholder">public</span> (or `private`).
+4. Run `git init -b main`, stage all files, commit with the message
+   "Initial commit", add the new repo as `origin`, and push to `main`.
+5. After the push, confirm by showing me the output of `git remote -v` and
+   `git log --oneline -1`.
+6. Then help me run the app locally: confirm `node --version` is 20+
+   (install Node via nvm if missing), run `npm install`, copy
+   `.env.example` to `.env.local` and pause so I can paste my Anthropic
+   API key, then run `npm run dev` and tell me which URL to open.
+
+Before pushing, double-check `git status --short` to make sure no `.env*`
+files or other secrets are about to be committed. If anything looks
+suspicious, stop and ask me.</div>
+
+    <div class="callout tip">
+      <strong>Why the "stop and ask me" line matters</strong>
+      AI agents will happily push whatever you tell them to. The safety check is your insurance policy in case a stray <code>.env</code> file made it into the folder.
+    </div>
+
+    <h3>What the agent will do</h3>
+    <ol>
+      <li>Run <code>pwd</code> and show you the path.</li>
+      <li>Run <code>rm -rf .git</code> (after asking for permission, since it's destructive).</li>
+      <li>Run <code>gh repo create &lt;name&gt; --public</code>.</li>
+      <li>Run the five git commands from Step 4 above.</li>
+      <li>Print the verification output for you to confirm.</li>
+    </ol>
+    <p>This is exactly what was done to publish the original repo, so the steps are battle-tested.</p>
+  </section>
+
+  <hr class="soft" />
+
+  <!-- ─────────────────────────── TROUBLESHOOTING ─────────────────────────── -->
+  <section class="step" id="troubleshooting">
+    <h2><span class="num">?</span> Troubleshooting</h2>
+
+    <h3><code>git: command not found</code></h3>
+    <p>macOS hasn't installed the Xcode Command Line Tools yet. Run <code>xcode-select --install</code> and follow the prompt.</p>
+
+    <h3><code>gh: command not found</code></h3>
+    <p>Either install with <code>brew install gh</code>, or skip the CLI and use the GitHub website (Step 3, Option B).</p>
+
+    <h3>Push is rejected with "non-fast-forward"</h3>
+    <p>The new GitHub repo wasn't empty — it probably has a README. Easiest fix: delete the new repo on GitHub, recreate it with <em>no</em> initial files, and re-run <code>git push -u origin main</code>.</p>
+
+    <h3>Push asks for a username and password</h3>
+    <p>GitHub no longer accepts passwords over HTTPS. Run <code>gh auth login</code>, choose <strong>HTTPS</strong> and <strong>authenticate Git with my GitHub credentials</strong> when asked. After that, pushes work silently.</p>
+
+    <h3>I see <code>fatal: not a git repository</code> in step 4</h3>
+    <p>You skipped <code>git init -b main</code>, or you ran it from the wrong folder. Run <code>pwd</code> to check where you are, then <code>cd</code> back into the project folder and start step 4 from the top.</p>
+
+    <h3>I accidentally pushed a secret</h3>
+    <p>Don't panic, but treat the secret as compromised. Rotate it (e.g., regenerate the API key), then either delete the GitHub repo and start over, or use <a href="https://github.com/newren/git-filter-repo" target="_blank" rel="noopener">git-filter-repo</a> to remove the file from history and force-push.</p>
+
+    <h3><code>node: command not found</code> or <code>npm: command not found</code></h3>
+    <p>Node didn't install correctly, or your Terminal hasn't picked up the new <code>PATH</code>. Close the Terminal completely (<kbd>⌘</kbd>+<kbd>Q</kbd>) and reopen it, then re-run <code>node --version</code>. If still missing and you used <code>nvm</code>, run <code>source ~/.nvm/nvm.sh</code>. If you used the official installer, restart your Mac.</p>
+
+    <h3><code>npm install</code> fails with <code>EACCES</code> or permission errors</h3>
+    <p>Don't use <code>sudo npm install</code> — that's how npm gets broken. Instead, switch to <code>nvm</code> (Step 5.1, Option A); it installs Node into your home directory where no permissions are needed.</p>
+
+    <h3>Port 32026 is already in use</h3>
+    <p>Another copy of the dev server is still running somewhere. Find and kill it:</p>
+<div class="cmd"><button class="copy">Copy</button>lsof -ti :32026 | xargs kill -9</div>
+    <p>Then re-run <code>npm run dev</code>.</p>
+
+    <h3>The terminal warns: <code>ANTHROPIC_API_KEY is not set</code></h3>
+    <p>Either you didn't create <code>.env.local</code>, you saved it as <code>.env.local.txt</code> (TextEdit sometimes adds the extension), or the key value is empty. From the Terminal:</p>
+<div class="cmd"><button class="copy">Copy</button>ls -la .env.local
+cat .env.local</div>
+    <p>The first command should show the file exists and is named exactly <code>.env.local</code>. The second should show your key (not the placeholder text). Restart the dev server (<kbd>Ctrl</kbd>+<kbd>C</kbd>, then <code>npm run dev</code>) — env files are read once on startup.</p>
+
+    <h3>"Generate plan" spins forever and nothing happens</h3>
+    <p>It's not actually stuck — Claude Opus can take up to two minutes for a structured 7-day plan. Check the Terminal where <code>npm run dev</code> is running; if you see request activity, just wait. To make it noticeably faster, edit <code>.env.local</code> and set <code>ANTHROPIC_MODEL=claude-sonnet-4-5</code>, then restart with <code>npm run dev</code>.</p>
+
+    <h3>Browser shows "This site can't be reached"</h3>
+    <p>Make sure the dev server is still running. The Terminal window where you ran <code>npm run dev</code> should be showing logs, not a blank prompt. If it crashed, scroll up in that window — the error message will be near the bottom.</p>
+  </section>
+
+  <footer>
+    Made for first-time contributors to <code>trackAndFieldWeeklyPlanner</code>.
+    Save this file or open it in any browser — no internet required.
+  </footer>
+
+</div>
+
+<script>
+  document.querySelectorAll(".cmd .copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var pre = btn.parentElement;
+      var clone = pre.cloneNode(true);
+      var b = clone.querySelector(".copy");
+      if (b) b.remove();
+      var text = clone.textContent.trim();
+      navigator.clipboard.writeText(text).then(
+        function () {
+          var orig = btn.textContent;
+          btn.textContent = "Copied";
+          btn.classList.add("ok");
+          setTimeout(function () {
+            btn.textContent = orig;
+            btn.classList.remove("ok");
+          }, 1500);
+        },
+        function () {
+          btn.textContent = "Press Cmd+C";
+        }
+      );
+    });
+  });
+</script>
+</body>
+</html>
